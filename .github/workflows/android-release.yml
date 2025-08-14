@@ -1,0 +1,46 @@
+name: Android Release to Firebase
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-distribute:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.x"
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Install Android NDK 27
+        run: sdkmanager "ndk;27.0.12077973"
+
+      - name: Build Android APK (release)
+        run: flutter build apk --release
+
+      - name: Write Firebase Service Account file
+        run: |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > $GITHUB_WORKSPACE/firebase_sa.json
+
+      - name: Distribute to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v2
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
+          serviceCredentialsFile: $GITHUB_WORKSPACE/firebase_sa.json
+          groups: testers
+          file: build/app/outputs/flutter-apk/app-release.apk
+          releaseNotes: "GitHub Release: ${{ github.event.release.tag_name }} - ${{ github.event.release.name }}"
