@@ -37,7 +37,7 @@ jobs:
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > $GITHUB_WORKSPACE/firebase_sa.json
 
       - name: Distribute to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v2
+        uses: wzieba/firebase-distribution-github-action@v1.4.0
         with:
           appId: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
           serviceCredentialsFile: $GITHUB_WORKSPACE/firebase_sa.json
