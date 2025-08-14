@@ -32,15 +32,10 @@ jobs:
       - name: Build Android APK (release)
         run: flutter build apk --release
 
-      - name: Write Firebase Service Account file
-        run: |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > $GITHUB_WORKSPACE/firebase_sa.json
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
 
-      - name: Distribute to Firebase App Distribution
-        uses: wzieba/firebase-distribution-github-action@master
-        with:
-          appId: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
-          serviceCredentialsFile: $GITHUB_WORKSPACE/firebase_sa.json
-          groups: testers
-          file: build/app/outputs/flutter-apk/app-release.apk
-          releaseNotes: "GitHub Release: ${{ github.event.release.tag_name }} - ${{ github.event.release.name }}"
+      - name: Distribute to Firebase
+        run: firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk --app ${{ secrets.FIREBASE_APP_ID_ANDROID }} --groups testers --release-notes "GitHub Release: ${{ github.event.release.tag_name }} - ${{ github.event.release.name }}"
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
