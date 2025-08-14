@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "431473406785",
+    "project_id": "mylottoapp-c6456",
+    "storage_bucket": "mylottoapp-c6456.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:431473406785:android:5ab4d1075b3aa5be8ca7c0",
+        "android_client_info": {
+          "package_name": "com.histvan86.my_first_app_lotto"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1M3GPtNGh55bzsVdhpKoZzaHxjcz7Bqk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
