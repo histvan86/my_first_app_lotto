@@ -1,8 +1,8 @@
+// Project-level Gradle (Kotlin DSL) — hagyjuk, hogy a Flutter plugin állítsa a verziókat
+
 plugins {
-    id("com.android.application") version "8.3.2" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.22" apply false
+    // Ne deklarálj itt AGP/Kotlin verziókat, a Flutter plugin kezeli
     id("dev.flutter.flutter-gradle-plugin") apply false
-    id("com.google.gms.google-services") version "4.4.1" apply false
 }
 
 allprojects {
