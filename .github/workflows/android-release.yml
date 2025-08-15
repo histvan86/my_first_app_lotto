@@ -61,10 +61,33 @@ jobs:
           PY
 
       - name: Build APK (release)
-        run: flutter build apk --release
+        run: flutter build apk --release -v
+
+      - name: Locate APK (any path)
+        id: locate_apk
+        run: |
+          set -e
+          echo "Searching for APKs..."
+          # tipikus flutter útvonal
+          if [ -f build/app/outputs/flutter-apk/app-release.apk ]; then
+            echo "apk=build/app/outputs/flutter-apk/app-release.apk" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          # klasszikus gradle útvonal
+          if [ -f android/app/build/outputs/apk/release/app-release.apk ]; then
+            echo "apk=android/app/build/outputs/apk/release/app-release.apk" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          # bárhol a repo-ban
+          APK_PATH=$(find . -type f -name "app-*.apk" -o -name "*.apk" | head -n 1 || true)
+          if [ -n "$APK_PATH" ]; then
+            echo "apk=$APK_PATH" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "No APK found"; exit 1
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: ${{ steps.locate_apk.outputs.apk }}
