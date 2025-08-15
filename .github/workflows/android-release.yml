@@ -40,7 +40,8 @@ jobs:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
           firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
-            --app ${{ secrets.FIREBASE_APP_ID_ANDROID }} \
-            --groups testers \
-            --release-notes "GitHub Release: ${{ github.event.release.tag_name }} - ${{ github.event.release.name }}"
+          --app ${{ secrets.FIREBASE_APP_ID_ANDROID }} \
+          --groups testers \
+          --release-notes "GitHub Release: ${{ github.event.release.tag_name }} - ${{ github.event.release.name }}"
+
 
