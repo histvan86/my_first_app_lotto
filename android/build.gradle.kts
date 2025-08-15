@@ -1,7 +1,18 @@
-// Project-level Gradle (Kotlin DSL) — hagyjuk, hogy a Flutter plugin állítsa a verziókat
+// Project-level Gradle (Kotlin DSL)
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Google Services plugin (legacy apply-hoz)
+        classpath("com.google.gms:google-services:4.4.1")
+    }
+}
 
 plugins {
-    // Ne deklarálj itt AGP/Kotlin verziókat, a Flutter plugin kezeli
+    // Flutter plugin kezeli az AGP/Kotlin verziókat, itt ne erőltessünk mást
     id("dev.flutter.flutter-gradle-plugin") apply false
 }
 
