@@ -24,8 +24,8 @@ android {
         applicationId = "com.histvan86.my_first_app_lotto"
         minSdk = 23
         targetSdk = 33 // 🔧 Cseréld le a flutter.targetSdkVersion-t
-        versionCode = 7 // 🔧 Cseréld le a flutter.versionCode-t
-        versionName = "1.0.7" // 🔧 Cseréld le a flutter.versionName-t
+        versionCode = 9 // 🔧 Cseréld le a flutter.versionCode-t
+        versionName = "1.0.9" // 🔧 Cseréld le a flutter.versionName-t
     }
 
     buildTypes {
