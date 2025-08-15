@@ -1,11 +1,63 @@
-- name: Verify Groovy build.gradle exists (no .kts)
-  run: |
-    if [ ! -f android/app/build.gradle ]; then
-      echo "ERROR: Missing android/app/build.gradle (Groovy)."
-      exit 1
-    fi
-    if [ -f android/app/build.gradle.kts ]; then
-      echo "ERROR: build.gradle.kts still exists, delete it."
-      exit 1
-    fi
-    echo "OK: Groovy build.gradle present, no .kts found."
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-distribute:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Groovy build.gradle exists (no .kts)
+        run: |
+          if [ ! -f android/app/build.gradle ]; then
+            echo "ERROR: Missing android/app/build.gradle (Groovy)."
+            exit 1
+          fi
+          if [ -f android/app/build.gradle.kts ]; then
+            echo "ERROR: build.gradle.kts still exists, delete it."
+            exit 1
+          fi
+          echo "OK: Groovy build.gradle present, no .kts found."
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.x"
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      # --- google-services.json fájl kiírása a secretből ---
+      - name: Write google-services.json
+        run: |
+          mkdir -p android/app
+          cat > android/app/google-services.json <<'EOF'
+          ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON }}
+          EOF
+
+      - name: Build Android APK (release)
+        run: flutter build apk --release
+
+      - name: List APK files
+        run: ls -R build/app/outputs/
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Distribute to Firebase
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
+          --app ${{ secrets.FIREBASE_APP_ID_ANDROID }} \
+          --groups testers \
+          --release-notes "GitHub Release: ${{ github.event.release.tag_name }} - ${{ github.event.release.name }}"
