@@ -1,43 +1,23 @@
-// Flutter app modul Gradle (Groovy) – CI-barát beállításokkal
+// App module Gradle (Groovy) – új Flutter plugin használattal (NINCS apply from)
 
-import java.util.Properties
-
-// local.properties beolvasása (flutter.sdk, verziók, stb.)
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'dev.flutter.flutter-gradle-plugin'   // <-- ez kell az "apply from" helyett
+    id 'com.google.gms.google-services'
 }
-
-def flutterSdkPath = localProperties.getProperty('flutter.sdk')
-if (flutterSdkPath == null) {
-    throw new GradleException("Flutter SDK not found. Define flutter.sdk in android/local.properties")
-}
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '9'
-def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0.9'
-def flutterMinSdkVersion = (localProperties.getProperty('flutter.minSdkVersion') ?: '23') as int
-def flutterTargetSdkVersion = (localProperties.getProperty('flutter.targetSdkVersion') ?: '34') as int
-def flutterCompileSdkVersion = (localProperties.getProperty('flutter.compileSdkVersion') ?: '34') as int
-
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'com.google.gms.google-services'
-apply from: "$flutterSdkPath/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     namespace "com.histvan86.my_first_app_lotto"
-    compileSdkVersion flutterCompileSdkVersion
+    compileSdkVersion 34
     ndkVersion "27.0.12077973"
 
     defaultConfig {
         applicationId "com.histvan86.my_first_app_lotto"
-        minSdkVersion flutterMinSdkVersion
-        targetSdkVersion flutterTargetSdkVersion
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        minSdkVersion 23
+        targetSdkVersion 34
+        versionCode 9
+        versionName "1.0.9"
     }
 
     compileOptions {
@@ -51,19 +31,18 @@ android {
 
     buildTypes {
         release {
-            // Első kör: debug keystore is elég App Distributionhöz
+            // Első körben debug keystore elég App Distributionhöz
             signingConfig signingConfigs.debug
-            // Play-re majd állíts be rendes keystore-t és proguardot, ha kell
         }
     }
 }
 
 flutter {
+    // a Flutter plugin elvárja ezt a blokkot Groovy-ban
     source '../..'
 }
 
 dependencies {
     implementation platform('com.google.firebase:firebase-bom:34.0.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
-    // ide jöhet később Auth/Crashlytics stb.
 }
