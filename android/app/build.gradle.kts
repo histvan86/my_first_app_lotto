@@ -6,31 +6,31 @@ plugins {
 }
 
 android {
-    namespace = "com.example.my_first_app_lotto"
-    compileSdk = 33 // 🔧 Cseréld le a flutter.compileSdkVersion-t
-
+    namespace = "com.histvan86.my_first_app_lotto"       // <-- ugyanaz, mint a Firebase app package name
+    compileSdk = 34
     ndkVersion = "27.0.12077973"
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
-
     defaultConfig {
-        applicationId = "com.histvan86.my_first_app_lotto"
+        applicationId = "com.histvan86.my_first_app_lotto" // <-- ugyanaz, mint a Firebase app package name
         minSdk = 23
-        targetSdk = 33 // 🔧 Cseréld le a flutter.targetSdkVersion-t
-        versionCode = 9 // 🔧 Cseréld le a flutter.versionCode-t
-        versionName = "1.0.9" // 🔧 Cseréld le a flutter.versionName-t
+        targetSdk = 34
+        versionCode = 9
+        versionName = "1.0.9"
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
     }
 
     buildTypes {
         release {
+            // Első körben debug-keystore-val építünk, hogy egyszerűbb legyen a teszt
             signingConfig = signingConfigs.getByName("debug")
+            // Ha Play Áruházba mész, itt majd be kell állítani a saját keystore-odat
         }
     }
 }
@@ -40,7 +40,10 @@ flutter {
 }
 
 dependencies {
+    // Firebase BOM – minden Firebase lib verziót összehangol
     implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
-    implementation("com.google.firebase:firebase-analytics")
-    // implementation("com.google.firebase:firebase-auth") // Ha kell Auth
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    // Ide jöhet más Firebase modul is, pl.:
+    // implementation("com.google.firebase:firebase-auth-ktx")
+    // implementation("com.google.firebase:firebase-crashlytics-ktx")
 }
