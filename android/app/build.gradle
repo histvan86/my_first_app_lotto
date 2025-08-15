@@ -1,21 +1,21 @@
-// App module Gradle (Groovy) – új Flutter plugin használattal (NINCS apply from)
+// App module Gradle (Groovy) — Flutter (declarative plugin) + Firebase BOM, compileSdk 36
 
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'dev.flutter.flutter-gradle-plugin'   // <-- ez kell az "apply from" helyett
-    id 'com.google.gms.google-services'
+    id 'dev.flutter.flutter-gradle-plugin'   // Flutter plugin (nincs több "apply from")
+    id 'com.google.gms.google-services'      // Google Services (Firebase)
 }
 
 android {
     namespace "com.histvan86.my_first_app_lotto"
-    compileSdkVersion 34
+    compileSdkVersion 36
     ndkVersion "27.0.12077973"
 
     defaultConfig {
         applicationId "com.histvan86.my_first_app_lotto"
         minSdkVersion 23
-        targetSdkVersion 34
+        targetSdkVersion 34          // maradhat 34; a pluginoknak a compileSdk a lényeg
         versionCode 9
         versionName "1.0.9"
     }
@@ -31,18 +31,20 @@ android {
 
     buildTypes {
         release {
-            // Első körben debug keystore elég App Distributionhöz
+            // Első körben debug keystore-ral írunk alá — App Distributionhöz elég
             signingConfig signingConfigs.debug
+            // Play-re majd állíts be saját keystore-t
         }
     }
 }
 
 flutter {
-    // a Flutter plugin elvárja ezt a blokkot Groovy-ban
     source '../..'
 }
 
 dependencies {
+    // 🔑 A BOM adja a Firebase verziókat — emiatt nem kell külön verzió az analytics-ktx sorban
     implementation platform('com.google.firebase:firebase-bom:34.0.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
+    // ide jöhet még: auth/crashlytics stb. BOM-mal verzió nélkül
 }
