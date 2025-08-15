@@ -1,23 +1,43 @@
-// App module Gradle (Groovy) – stabil Flutter + Firebase beállítás
+// Flutter app modul Gradle (Groovy) – CI-barát beállításokkal
 
-def flutterProjectRoot = rootProject.projectDir.parentFile.toPath()
+import java.util.Properties
+
+// local.properties beolvasása (flutter.sdk, verziók, stb.)
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterSdkPath = localProperties.getProperty('flutter.sdk')
+if (flutterSdkPath == null) {
+    throw new GradleException("Flutter SDK not found. Define flutter.sdk in android/local.properties")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '9'
+def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0.9'
+def flutterMinSdkVersion = (localProperties.getProperty('flutter.minSdkVersion') ?: '23') as int
+def flutterTargetSdkVersion = (localProperties.getProperty('flutter.targetSdkVersion') ?: '34') as int
+def flutterCompileSdkVersion = (localProperties.getProperty('flutter.compileSdkVersion') ?: '34') as int
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
-apply from: "$flutterProjectRoot/packages/flutter_tools/gradle/flutter.gradle"
+apply from: "$flutterSdkPath/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     namespace "com.histvan86.my_first_app_lotto"
-    compileSdkVersion 34
+    compileSdkVersion flutterCompileSdkVersion
     ndkVersion "27.0.12077973"
 
     defaultConfig {
         applicationId "com.histvan86.my_first_app_lotto"
-        minSdkVersion 23
-        targetSdkVersion 34
-        versionCode 9
-        versionName "1.0.9"
+        minSdkVersion flutterMinSdkVersion
+        targetSdkVersion flutterTargetSdkVersion
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
     }
 
     compileOptions {
@@ -31,12 +51,9 @@ android {
 
     buildTypes {
         release {
-            // Első körben debug keystore-ral írunk alá – App Distributionnek elég
+            // Első kör: debug keystore is elég App Distributionhöz
             signingConfig signingConfigs.debug
-            // Ha Play Áruház:
-            // minifyEnabled true
-            // shrinkResources true
-            // proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Play-re majd állíts be rendes keystore-t és proguardot, ha kell
         }
     }
 }
@@ -48,5 +65,5 @@ flutter {
 dependencies {
     implementation platform('com.google.firebase:firebase-bom:34.0.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
+    // ide jöhet később Auth/Crashlytics stb.
 }
-
