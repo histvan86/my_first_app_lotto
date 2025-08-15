@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'dev.flutter.flutter-gradle-plugin'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -38,11 +39,7 @@ flutter {
 }
 
 dependencies {
-    // Firebase BOM: ez adja a verziókat a többi Firebase modulhoz
-    implementation platform('com.google.firebase:firebase-bom:34.0.0')
-    implementation 'com.google.firebase:firebase-analytics-ktx'
-    // ide jöhet még: auth/crashlytics stb. verzió nélkül (BOM miatt)
+    // ===== Firebase – explicit verzió, NINCS BOM =====
+    implementation 'com.google.firebase:firebase-analytics-ktx:21.5.1'
+    // Ha később más Firebase modult is felveszel, adj neki is konkrét verziót.
 }
-
-/*** VERY IMPORTANT: Google Services plugin legacy apply ***/
-apply plugin: 'com.google.gms.google-services'
