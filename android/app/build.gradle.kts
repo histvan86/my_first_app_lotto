@@ -28,6 +28,7 @@ android {
 
     buildTypes {
         release {
+            // első körben elég a debug keystore az App Distributionhöz
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -38,6 +39,8 @@ flutter {
 }
 
 dependencies {
+    // A BOM adja a Firebase verziókat
     implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
-    implementation("com.google.firebase:firebase-analytics-ktx:21.5.1")
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    // ide veheted fel később: auth/crashlytics stb. verzió nélkül
 }
