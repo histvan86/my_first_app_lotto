@@ -26,11 +26,11 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
-      - name: Install Android NDK 27
-        run: sdkmanager "ndk;27.0.12077973"
-
       - name: Build Android APK (release)
         run: flutter build apk --release
+
+      - name: List APK files
+        run: ls -R build/app/outputs/
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
