@@ -1,50 +1,24 @@
-// App module Gradle (Groovy) — Flutter (declarative plugin) + Firebase BOM, compileSdk 36
+// Top-level Gradle build file where you can add configuration options common to all sub-projects/modules.
 
-plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'dev.flutter.flutter-gradle-plugin'   // Flutter plugin (nincs több "apply from")
-    id 'com.google.gms.google-services'      // Google Services (Firebase)
-}
-
-android {
-    namespace "com.histvan86.my_first_app_lotto"
-    compileSdkVersion 36
-    ndkVersion "27.0.12077973"
-
-    defaultConfig {
-        applicationId "com.histvan86.my_first_app_lotto"
-        minSdkVersion 23
-        targetSdkVersion 34          // maradhat 34; a pluginoknak a compileSdk a lényeg
-        versionCode 9
-        versionName "1.0.9"
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-
-    buildTypes {
-        release {
-            // Első körben debug keystore-ral írunk alá — App Distributionhöz elég
-            signingConfig signingConfigs.debug
-            // Play-re majd állíts be saját keystore-t
-        }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.3.2'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22'
+        classpath 'com.google.gms:google-services:4.4.1'
     }
 }
 
-flutter {
-    source '../..'
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
 }
 
-dependencies {
-    // 🔑 A BOM adja a Firebase verziókat — emiatt nem kell külön verzió az analytics-ktx sorban
-    implementation platform('com.google.firebase:firebase-bom:34.0.0')
-    implementation 'com.google.firebase:firebase-analytics-ktx'
-    // ide jöhet még: auth/crashlytics stb. BOM-mal verzió nélkül
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
 }
