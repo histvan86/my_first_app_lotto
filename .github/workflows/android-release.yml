@@ -31,14 +31,14 @@ jobs:
             echo "OK: No Groovy build.gradle in android/app."
           fi
 
-      - name: Search for flutter.minSdkVersion anywhere
+      - name: Search for legacy flutter.minSdkVersion (exclude .github)
         run: |
           set -e
-          if grep -RIn "flutter.minSdkVersion" . ; then
-            echo "ERROR: Found 'flutter.minSdkVersion' somewhere in repo. Remove/replace it."
+          if grep -RIn --exclude-dir=.github "flutter\.minSdkVersion" . ; then
+            echo "ERROR: Found 'flutter.minSdkVersion' somewhere outside .github. Remove/replace it."
             exit 1
           else
-            echo "OK: No 'flutter.minSdkVersion' string found in repo."
+            echo "OK: No 'flutter.minSdkVersion' string found outside .github."
           fi
 
       - name: Print app/build.gradle.kts head
@@ -67,7 +67,6 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
-      # google-services.json létrehozása a secretből
       - name: Write google-services.json
         run: |
           mkdir -p android/app
