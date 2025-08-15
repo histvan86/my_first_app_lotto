@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    namespace = "com.histvan86.my_first_app_lotto"       // <-- ugyanaz, mint a Firebase app package name
+    namespace = "com.histvan86.my_first_app_lotto"       // <<< egyezzen a Firebase app package neveddel
     compileSdk = 34
     ndkVersion = "27.0.12077973"
 
     defaultConfig {
-        applicationId = "com.histvan86.my_first_app_lotto" // <-- ugyanaz, mint a Firebase app package name
+        applicationId = "com.histvan86.my_first_app_lotto" // <<< egyezzen a Firebase app package neveddel
         minSdk = 23
         targetSdk = 34
         versionCode = 9
@@ -28,9 +28,11 @@ android {
 
     buildTypes {
         release {
-            // Első körben debug-keystore-val építünk, hogy egyszerűbb legyen a teszt
+            // Első körben debug-keystore-ral írunk alá, App Distributionhöz elég
             signingConfig = signingConfigs.getByName("debug")
-            // Ha Play Áruházba mész, itt majd be kell állítani a saját keystore-odat
+            // Ha Playre mész:
+            // isMinifyEnabled = true
+            // proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 }
@@ -40,10 +42,10 @@ flutter {
 }
 
 dependencies {
-    // Firebase BOM – minden Firebase lib verziót összehangol
+    // Firebase BOM – nem kell egyesével verziózni a Firebase csomagokat
     implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")
-    // Ide jöhet más Firebase modul is, pl.:
+    // Később ide veheted fel:
     // implementation("com.google.firebase:firebase-auth-ktx")
     // implementation("com.google.firebase:firebase-crashlytics-ktx")
 }
