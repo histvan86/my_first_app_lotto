@@ -1,94 +1,11 @@
-on:
-  workflow_dispatch:
-  release:
-    types: [published]
-
-jobs:
-  build-and-distribute:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Show HEAD and files
-        run: |
-          echo "HEAD ref: $GITHUB_REF"
-          echo "HEAD sha: $GITHUB_SHA"
-          git log --oneline -n 3
-          echo "Repo tree (top-level):"
-          ls -la
-          echo "Android tree:"
-          ls -la android || true
-          ls -la android/app || true
-
-      - name: Fail if legacy Gradle file exists (Groovy)
-        run: |
-          if [ -f android/app/build.gradle ]; then
-            echo "ERROR: Found android/app/build.gradle (Groovy). Delete it; we use build.gradle.kts."
-            exit 1
-          else
-            echo "OK: No Groovy build.gradle in android/app."
-          fi
-
-      - name: Search for legacy flutter.minSdkVersion (exclude .github)
-        run: |
-          set -e
-          if grep -RIn --exclude-dir=.github "flutter\.minSdkVersion" . ; then
-            echo "ERROR: Found 'flutter.minSdkVersion' somewhere outside .github. Remove/replace it."
-            exit 1
-          else
-            echo "OK: No 'flutter.minSdkVersion' string found outside .github."
-          fi
-
-      - name: Print app/build.gradle.kts head
-        run: |
-          echo "---- HEAD OF android/app/build.gradle.kts ----"
-          sed -n '1,120p' android/app/build.gradle.kts
-          echo "---------------------------------------------"
-          if grep -n "minSdkVersion" android/app/build.gradle.kts ; then
-            echo "ERROR: 'minSdkVersion ...' found in KTS file. Replace with 'minSdk = 23' etc."
-            exit 1
-          else
-            echo "OK: No 'minSdkVersion' directive in KTS."
-          fi
-
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.x"
-
-      - name: Flutter pub get
-        run: flutter pub get
-
-      - name: Write google-services.json
-        run: |
-          mkdir -p android/app
-          cat > android/app/google-services.json <<'EOF'
-          ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON }}
-          EOF
-          test -s android/app/google-services.json || (echo "EMPTY google-services.json from secret" && exit 1)
-
-      - name: Build Android APK (release)
-        run: flutter build apk --release
-
-      - name: List APK files
-        run: ls -R build/app/outputs/ || true
-
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
-
-      - name: Distribute to Firebase
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: |
-          firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
-          --app ${{ secrets.FIREBASE_APP_ID_ANDROID }} \
-          --groups testers \
-          --release-notes "GitHub Release: ${{ github.event.release.tag_name }} - ${{ github.event.release.name }}"
+- name: Verify Groovy build.gradle exists (no .kts)
+  run: |
+    if [ ! -f android/app/build.gradle ]; then
+      echo "ERROR: Missing android/app/build.gradle (Groovy)."
+      exit 1
+    fi
+    if [ -f android/app/build.gradle.kts ]; then
+      echo "ERROR: build.gradle.kts still exists, delete it."
+      exit 1
+    fi
+    echo "OK: Groovy build.gradle present, no .kts found."
