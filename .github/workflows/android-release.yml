@@ -27,7 +27,7 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
-      # Írjunk local.properties-t, hogy a Gradle tudja hol az Android SDK és a Flutter SDK
+      # írunk local.properties-t, hogy a Flutter/Gradle biztosan találja az SDK-kat
       - name: Write android/local.properties
         run: |
           mkdir -p android
@@ -36,20 +36,20 @@ jobs:
           flutter.sdk=${FLUTTER_ROOT}
           EOF
 
-      # Telepítünk egy sima Gradle-t (nincs wrapper a repo-ban)
-      - name: Install Gradle 8.7
-        run: |
-          wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip
-          unzip -q gradle-8.7-bin.zip
-          echo "$PWD/gradle-8.7/bin" >> $GITHUB_PATH
+      # egyszerű Flutter build (nincs gradle wrapper, nincs külön gradle letöltés)
+      - name: Build release APK
+        run: flutter build apk --release
 
-      # Építés közvetlenül Gradle-lel
-      - name: Build with Gradle (assembleRelease)
-        working-directory: android
-        run: gradle :app:assembleRelease --no-daemon
-
-      # APK-k kilistázása, hogy lássuk a pontos útvonalat
+      # listázzuk ki a létrejött APK-kat a logba, hogy lássuk a pontos helyet
       - name: Locate APK(s)
         run: |
-          echo "Searching for APKs..."
-          find android/app/build/outputs -type f -name "*.apk" -ls || true
+          echo "Searching for APKs under build/app/outputs ..."
+          find build/app/outputs -type f -name "*.apk" -ls || true
+
+      # feltöltjük artefaktként – bármely APK az outputs alatt
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: build/app/outputs/**/*.apk
+          if-no-files-found: error
