@@ -1,5 +1,5 @@
 pluginManagement {
-  // --- Find Flutter SDK from local.properties, fallback to FLUTTER_ROOT env
+  // --- Flutter SDK elérési útja: local.properties -> flutter.sdk, fallback: FLUTTER_ROOT env
   def flutterSdkPath = null
   def propsFile = new File(rootDir, "local.properties")
   if (propsFile.exists()) {
