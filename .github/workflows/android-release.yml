@@ -27,18 +27,20 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
-      # --- Build APK Flutterrel ---
-      - name: Build APK (release)
-        run: flutter build apk --release -v
+      # --- Build (egyszerű, csendes) ---
+      - name: Build release APK
+        run: flutter build apk --release
 
-      # --- APK feltöltése artifactként (több lehetséges útvonalat is lefedünk) ---
+      # --- APK helyének megmutatása a logban ---
+      - name: Locate APK(s)
+        run: |
+          echo "Searching for APKs under build/app/outputs ..."
+          find build/app/outputs -type f -name "*.apk" -ls || true
+
+      # --- APK feltöltése artefaktként (akárhol az outputs alatt) ---
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release-apk
-          path: |
-            build/app/outputs/flutter-apk/app-release.apk
-            build/**/outputs/**/release/*.apk
-            android/app/build/outputs/apk/release/*.apk
-            **/*.apk
+          path: build/app/outputs/**/*.apk
           if-no-files-found: error
